@@ -1,47 +1,79 @@
 import { Project } from './Project';
+import { SVG } from './svg';
+
+const LocalDB = (() => {
+    const saveProjects = (projects) => {
+        localStorage.setItem("projects", JSON.stringify(projects));
+    }
+
+    const saveTodo = (title, ToDos) => {
+        localStorage.setItem(title, JSON.stringify(ToDos));
+    }
+
+    const getProjects = () => {
+        let projects = [];
+        if (localStorage.hasOwnProperty("projects")) {
+            let retrievedProjects = JSON.parse(localStorage.getItem("projects"));
+            retrievedProjects.forEach(project => {
+                projects.push(Project(project.title, project.description));
+                if (localStorage.hasOwnProperty(project.title)) {
+                    let retrievedTodos = JSON.parse(localStorage.getItem(project.title));
+                    retrievedTodos.forEach(ToDo => {
+                        projects[projects.length - 1].addToDo(ToDo.title, ToDo.description, ToDo.duedate, ToDo.priority, ToDo.notes, ToDo.checked);
+                    });
+                }
+
+            });
+
+        }
+        return projects;
+    }
+
+    const removeToDos = (title) => {
+        localStorage.removeItem(title);
+    }
+
+    return { saveProjects, getProjects, removeToDos, saveTodo };
+})();
 
 const Projects = (() => {
 
-    let projects = [];
-
-    if (localStorage.hasOwnProperty("projects")) {
-        let retrievedProjects = JSON.parse(localStorage.getItem("projects"));
-        retrievedProjects.forEach(project => {
-            projects.push(Project(project.title, project.description));
-            if (localStorage.hasOwnProperty(project.title)) {
-                let retrievedTodos = JSON.parse(localStorage.getItem(project.title));
-                retrievedTodos.forEach(ToDo => {
-                    projects[projects.length - 1].addToDo(ToDo.title, ToDo.description, ToDo.dueDate, ToDo.priority, ToDo.notes, ToDo.checked);
-                });
-            }
-
-        });
-
-    }
-
+    let projects = LocalDB.getProjects();
 
     const addProject = (title, description) => {
         projects.push(Project(title, description));
-        localStorage.setItem("projects", JSON.stringify(projects));
+        LocalDB.saveProjects(projects);
     }
 
     const editProject = (index, title, description) => {
+        LocalDB.removeToDos(projects[index].title);
         projects[index].title = title;
         projects[index].description = description;
-        localStorage.setItem("projects", JSON.stringify(projects));
+        LocalDB.saveProjects(projects);
+        LocalDB.saveTodo(projects[index].title, projects[index].getAllToDos());
     }
 
     const getAllProjects = () => {
         return projects;
     }
 
-    const removeProject = (index) => {
-        localStorage.removeItem(projects[index].title);
-        projects.splice(index, 1);
-        localStorage.setItem("projects", JSON.stringify(projects));
+    const addToDoOnProject = (index, title) => {
+        projects[index].addToDo(title, "", new Date(), "Low", "", false);
+        LocalDB.saveTodo(projects[index].title, projects[index].getAllToDos());
+
     }
 
-    return { addProject, getAllProjects, removeProject, editProject };
+    const getProject = (index) => {
+        return projects[index];
+    }
+
+    const removeProject = (index) => {
+        LocalDB.removeToDos(projects[index].title);
+        projects.splice(index, 1);
+        LocalDB.saveProjects(projects);
+    }
+
+    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject };
 })();
 
 
@@ -73,14 +105,53 @@ const ManipulateDOM = (() => {
                     todos.removeChild(todos.lastChild);
                 }
                 projectDetails.appendChild(ProjectFieldsDOM(project, index));
-                todos.appendChild(ToDosDOM(project, index));
-            });
+                todos.appendChild(todosDOM(index));
+                todos.appendChild(barDOM(index));
+            })
             projectsDOM.appendChild(projectDOM);
         });
 
     }
 
-    const ToDosDOM = (project, index) => {
+    const todosDOM = (index) => {
+        let todowrap = document.createElement("div");
+        todowrap.classList.add("todowrap");
+        Projects.getProject(index).getAllToDos().forEach((ToDo, index) => {
+            let todo = document.createElement("div");
+            todo.classList.add("todo");
+            let todo_info = document.createElement("div");
+            todo_info.classList.add("todo-info");
+            let todo_buttons = document.createElement("div");
+            todo_buttons.classList.add("todo-btns");
+            todo.dataset.id = index;
+            let pTitle = document.createElement("p");
+            pTitle.classList.add("todo-title");
+            pTitle.textContent = ToDo.title;
+            let pDescription = document.createElement("p");
+            pDescription.classList.add("todo-description");
+            pDescription.textContent = ToDo.description;
+            let pDate = document.createElement("p");
+            pDate.classList.add("todo-date");
+            pDate.textContent = ToDo.duedate;
+            let btnEdit = document.createElement("button");
+            let btnDelete = document.createElement("button");
+            btnDelete.id = "btnBorrarToDo";
+            btnEdit.id = "btnEditarToDo";
+            btnEdit.innerHTML = SVG.editBtn();
+            btnDelete.innerHTML = SVG.deleteBtn();
+            todo_buttons.appendChild(btnEdit);
+            todo_buttons.appendChild(btnDelete);
+            todo_info.appendChild(pTitle);
+            todo_info.appendChild(pDescription);
+            todo_info.appendChild(pDate);
+            todo.appendChild(todo_info);
+            todo.appendChild(todo_buttons);
+            todowrap.appendChild(todo);
+        });
+        return todowrap;
+    }
+
+    const barDOM = (index) => {
         let bar = document.createElement("div");
         bar.classList.add("bar");
         let input = document.createElement("input");
@@ -91,6 +162,21 @@ const ManipulateDOM = (() => {
         buttonAdd.textContent = "+";
         bar.appendChild(input);
         bar.appendChild(buttonAdd);
+        buttonAdd.addEventListener("click", () => {
+            if (input.value !== "") {
+                const todos = document.querySelector(".todos");
+                Projects.addToDoOnProject(index, input.value);
+                while (todos.firstChild) {
+                    todos.removeChild(todos.lastChild);
+                }
+                todos.appendChild(todosDOM(index));
+                todos.appendChild(barDOM(index));
+            }
+            else {
+                input.placeholder = "You should introduce something here.";
+            }
+
+        })
 
         return bar;
     }
@@ -105,8 +191,21 @@ const ManipulateDOM = (() => {
         let btnDelete = document.createElement("button");
         btnEdit.id = "btnEdit";
         btnDelete.id = "btnDelete";
-        btnEdit.textContent = "Edit";
-        btnDelete.textContent = "Delete";
+        btnEdit.innerHTML = SVG.editBtn();
+        btnDelete.innerHTML = SVG.deleteBtn();
+
+        // Edit Button Action
+
+        btnEdit.addEventListener("click", () => {
+
+            const projectsDOM = document.querySelector(".list-projects");
+            document.querySelector("#btnAddProject").classList.add("hidden");
+            document.querySelector("#btnBackProject").classList.remove("hidden");
+            projectsDOM.replaceChildren(EditProjectDOM(project, index));
+
+        })
+
+        // Delete Button Action
 
         btnDelete.addEventListener("click", () => {
             Projects.removeProject(index);
@@ -118,16 +217,6 @@ const ManipulateDOM = (() => {
                 todos.removeChild(todos.lastChild);
             }
             reloadProjects();
-        });
-
-        btnEdit.addEventListener("click", () => {
-            const projectsDOM = document.querySelector(".list-projects");
-            while (projectsDOM.firstChild) {
-                projectsDOM.removeChild(projectsDOM.lastChild);
-            }
-            document.querySelector("#btnAddProject").classList.add("hidden");
-            document.querySelector("#btnBackProject").classList.remove("hidden");
-            projectsDOM.appendChild(EditProjectDOM(project, index));
         });
 
         wrap.appendChild(title);
@@ -165,7 +254,7 @@ const ManipulateDOM = (() => {
         form.appendChild(txtDescription);
         form.appendChild(btnSubmit);
         form.appendChild(Error);
-        btnSubmit.addEventListener("click", (e) => {
+        btnSubmit.addEventListener("click", () => {
             if (txtTitle.value !== "" && txtDescription.value !== "") {
                 Projects.editProject(index, txtTitle.value, txtDescription.value);
                 reloadProjects();
@@ -176,7 +265,8 @@ const ManipulateDOM = (() => {
                 Error.textContent = "ERROR: Fields are still empty";
                 Error.classList.remove("hidden");
             }
-        });
+        })
+
         return form;
     }
 
@@ -207,10 +297,12 @@ const ManipulateDOM = (() => {
         form.appendChild(txtDescription);
         form.appendChild(btnSubmit);
         form.appendChild(Error);
+
+        // Submit Add Button Action
         btnSubmit.addEventListener("click", (e) => {
             if (txtTitle.value !== "" && txtDescription.value !== "") {
                 Projects.addProject(txtTitle.value, txtDescription.value);
-                ManipulateDOM.reloadProjects();
+                reloadProjects();
                 document.querySelector("#btnBackProject").classList.add("hidden");
                 document.querySelector("#btnAddProject").classList.remove("hidden");
             }
@@ -230,28 +322,31 @@ const ManipulateDOM = (() => {
         putProjects();
     }
 
-    const eventsListeners = () => {
+    const InitialEvents = () => {
         const btnAddProject = document.querySelector("#btnAddProject");
         const btnBack = document.querySelector("#btnBackProject");
         btnAddProject.addEventListener("click", (e) => {
-            const projectsDOM = document.querySelector(".list-projects");
-            while (projectsDOM.firstChild) {
-                projectsDOM.removeChild(projectsDOM.lastChild);
-            }
+            const projectDOM = document.querySelector(".list-projects");
+
             e.target.classList.add("hidden");
             btnBack.classList.remove("hidden");
-            projectsDOM.appendChild(createNewProjectDOM());
+            projectDOM.replaceChildren(createNewProjectDOM());
 
         });
         btnBack.addEventListener("click", (e) => {
             e.target.classList.add("hidden");
             btnAddProject.classList.remove("hidden");
-            ManipulateDOM.reloadProjects();
+            reloadProjects();
         });
     }
-    return { reloadProjects, eventsListeners }
+
+    const init = () => {
+        reloadProjects();
+        InitialEvents();
+    }
+
+    return { init }
 })();
 
 
-ManipulateDOM.reloadProjects();
-ManipulateDOM.eventsListeners();
+ManipulateDOM.init();

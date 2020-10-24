@@ -69,6 +69,20 @@ body{
     transition-duration: 200ms;
 }
 
+#btnEditarToDo{
+    margin: 1rem 1rem;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+    background-color: #416165;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition-duration: 200ms;
+}
+#btnEditarToDo:hover{
+    background-color: #ACB0BD;
+}
+
 #btnEdit:hover{
     background-color: #ACB0BD;
 }
@@ -85,6 +99,21 @@ body{
 }
 
 #btnDelete:hover{
+    background-color: #ac0600;
+}
+
+#btnBorrarToDo{
+    margin: 1rem 1rem;
+    padding: 0.8rem;
+    font-size: 0.9rem;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition-duration: 200ms;
+}
+
+#btnBorrarToDo:hover{
     background-color: #ac0600;
 }
 
@@ -192,6 +221,31 @@ input:focus {
 
 .btn-fixed:hover{
     background-color: #ebebeb;
+}
+
+.todowrap{
+    margin-bottom: 4rem;
+}
+
+.todo{
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    font-size: 1rem;
+    background-color:#e7e7e7;
+    border-radius: 1rem;
+    margin: 1rem;
+    
+}
+
+.todo-description {
+    font-size: 0.8rem;
+    margin-top: 0;
+}
+
+.todo-date {
+    font-size: 0.8rem;
+    margin-top: 0;
 }
 
 @media(max-width: 500px){

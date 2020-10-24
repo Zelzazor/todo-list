@@ -9,13 +9,16 @@ const Project = (title, description) => {
         ToDos.push(ToDo(title, description, dueDate, priority, notes, checked));
     }
     const getAllToDos = () => {
+
         return ToDos;
     }
     const removeToDo = (index) => {
         ToDos.splice(index, 1);
     }
-
-    return { title, description, addToDo, getAllToDos, removeToDo };
+    const getToDo = (index) => {
+        return ToDos[index];
+    }
+    return { title, description, addToDo, getAllToDos, removeToDo, getToDo };
 }
 
 
