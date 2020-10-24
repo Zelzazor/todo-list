@@ -3,6 +3,7 @@ import { Project } from './Project';
 const Projects = (() => {
 
     let projects = [];
+
     if (localStorage.hasOwnProperty("projects")) {
         let retrievedProjects = JSON.parse(localStorage.getItem("projects"));
         retrievedProjects.forEach(project => {
@@ -63,14 +64,35 @@ const ManipulateDOM = (() => {
             projectDOM.appendChild(descDOM);
             projectDOM.addEventListener("click", () => {
                 let projectDetails = document.querySelector(".project-details");
+                let todos = document.querySelector(".todos");
+
                 while (projectDetails.firstChild) {
                     projectDetails.removeChild(projectDetails.lastChild);
                 }
+                while (todos.firstChild) {
+                    todos.removeChild(todos.lastChild);
+                }
                 projectDetails.appendChild(ProjectFieldsDOM(project, index));
+                todos.appendChild(ToDosDOM(project, index));
             });
             projectsDOM.appendChild(projectDOM);
         });
 
+    }
+
+    const ToDosDOM = (project, index) => {
+        let bar = document.createElement("div");
+        bar.classList.add("bar");
+        let input = document.createElement("input");
+        input.type = "text";
+        input.classList.add("text-fixed");
+        let buttonAdd = document.createElement("button");
+        buttonAdd.classList.add("btn-fixed");
+        buttonAdd.textContent = "+";
+        bar.appendChild(input);
+        bar.appendChild(buttonAdd);
+
+        return bar;
     }
 
 
@@ -88,8 +110,12 @@ const ManipulateDOM = (() => {
 
         btnDelete.addEventListener("click", () => {
             Projects.removeProject(index);
+            let todos = document.querySelector(".todos");
             while (wrap.firstChild) {
                 wrap.removeChild(wrap.lastChild);
+            }
+            while (todos.firstChild) {
+                todos.removeChild(todos.lastChild);
             }
             reloadProjects();
         });

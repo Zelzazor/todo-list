@@ -130,7 +130,7 @@ label{
     padding: 0.8rem 0rem;
 }
 
-input[type=text]{
+.form-add > input[type=text]{
     border: solid 0.15rem #416165;
     border-radius: 1rem;
     padding: 0.2rem;
@@ -138,7 +138,7 @@ input[type=text]{
     transition-duration: 200ms;
 }
 
-input[type=text]:hover{
+.form-add > input[type=text]:hover{
     transform: scale(1.03);
 }
 
@@ -151,6 +151,48 @@ input:focus {
     text-align: center;
 }
 
+
+
+.bar{
+    display: flex;
+    height: 7vh;
+    position: fixed;
+    width: 70%;
+    bottom: 0;
+    right: 0;
+    margin: 1% 2%;
+    border-radius: 1rem;
+    background-color: white;
+    transition-duration: 200ms;
+}
+
+.bar:hover{
+    box-shadow: 0 0 0.5rem #000000;
+}
+
+.text-fixed{
+    padding: 0.8rem;
+    font-size: 1.3rem;
+    border-radius: 1rem;
+    border: none;
+    width: 100%;
+}
+
+
+.btn-fixed{
+    background-color: white;
+    color: black;
+    border-radius: 1rem;
+    width: 3rem;
+    font-size: 2rem;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.btn-fixed:hover{
+    background-color: #ebebeb;
+}
 
 @media(max-width: 500px){
     .container{
@@ -166,6 +208,10 @@ input:focus {
     .project-options{
 
         font-size: 0.5rem;
+    }
+
+    .bar{
+        width: 95%;
     }
 
     .todos{
