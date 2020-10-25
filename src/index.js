@@ -119,6 +119,12 @@ const ManipulateDOM = (() => {
         Projects.getProject(index).getAllToDos().forEach((ToDo, index) => {
             let todo = document.createElement("div");
             todo.classList.add("todo");
+            switch (ToDo.priority.toLowerCase()) {
+                case 'low': todo.classList.add("low-p"); break;
+                case 'medium': todo.classList.add("medium-p"); break;
+                case 'high': todo.classList.add("high-p"); break;
+
+            }
             let todo_info = document.createElement("div");
             todo_info.classList.add("todo-info");
             let todo_buttons = document.createElement("div");
@@ -185,6 +191,10 @@ const ManipulateDOM = (() => {
     const ProjectFieldsDOM = (project, index) => {
         let wrap = document.createElement("div");
         wrap.classList.add("project-options");
+        let info = document.createElement("div");
+        info.classList.add("project-info");
+        let wrapbuttons = document.createElement("div");
+        wrapbuttons.classList.add("project-buttons");
         let title = document.createElement("h1");
         title.textContent = project.title;
         let btnEdit = document.createElement("button");
@@ -218,10 +228,11 @@ const ManipulateDOM = (() => {
             }
             reloadProjects();
         });
-
-        wrap.appendChild(title);
-        wrap.appendChild(btnEdit);
-        wrap.appendChild(btnDelete);
+        info.appendChild(title);
+        wrapbuttons.appendChild(btnEdit);
+        wrapbuttons.appendChild(btnDelete);
+        wrap.appendChild(info);
+        wrap.appendChild(wrapbuttons);
         return wrap;
     }
 
