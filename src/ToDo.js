@@ -1,17 +1,18 @@
-import { format } from 'date-fns';
+
 
 const ToDo = (title, description, duedate, priority, notes, checked) => {
-    if (duedate instanceof Date) {
-        duedate = format(duedate, 'PPPP');
+    if(!(duedate instanceof Date)){
+        duedate = new Date(duedate);
     }
-
 
     const getDate = () => {
         return duedate;
     }
 
-    const setDate = (newDate) => {
-        duedate = format(newDate, 'PPPP');
+    const setDate = (newDate = new Date()) => {
+        if(duedate instanceof Date){
+            duedate = newDate;
+        }
     }
 
     const getChecked = () => {

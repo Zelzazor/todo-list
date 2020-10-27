@@ -12,6 +12,7 @@ const Project = (title, description) => {
 
         return ToDos;
     }
+    
     const removeToDo = (index) => {
         ToDos.splice(index, 1);
     }

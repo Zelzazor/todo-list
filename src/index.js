@@ -1,5 +1,6 @@
 import { Project } from './Project';
 import { SVG } from './svg';
+import { format } from 'date-fns';
 
 const LocalDB = (() => {
     const saveProjects = (projects) => {
@@ -58,7 +59,13 @@ const Projects = (() => {
     }
 
     const addToDoOnProject = (index, title) => {
-        projects[index].addToDo(title, "", new Date(), "Low", "", false);
+        let today = new Date();
+        let day = today.getDate();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        let hours = today.getHours();
+        let minutes = today.getMinutes();
+        projects[index].addToDo(title, "", new Date(year,month,day,hours,minutes), "Low", "", false);
         LocalDB.saveTodo(projects[index].title, projects[index].getAllToDos());
 
     }
@@ -73,7 +80,12 @@ const Projects = (() => {
         LocalDB.saveProjects(projects);
     }
 
-    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject };
+    const deleteToDofromProject = (indexProject, indexToDo) => {
+        projects[indexProject].removeToDo(indexToDo);
+        LocalDB.saveTodo(projects[indexProject].title, projects[indexProject].getAllToDos());
+    }
+
+    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject, deleteToDofromProject };
 })();
 
 
@@ -116,7 +128,7 @@ const ManipulateDOM = (() => {
     const todosDOM = (index) => {
         let todowrap = document.createElement("div");
         todowrap.classList.add("todowrap");
-        Projects.getProject(index).getAllToDos().forEach((ToDo, index) => {
+        Projects.getProject(index).getAllToDos().forEach((ToDo, j) => {
             let todo = document.createElement("div");
             todo.classList.add("todo");
             switch (ToDo.priority.toLowerCase()) {
@@ -129,7 +141,7 @@ const ManipulateDOM = (() => {
             todo_info.classList.add("todo-info");
             let todo_buttons = document.createElement("div");
             todo_buttons.classList.add("todo-btns");
-            todo.dataset.id = index;
+            todo.dataset.id = j;
             let pTitle = document.createElement("p");
             pTitle.classList.add("todo-title");
             pTitle.textContent = ToDo.title;
@@ -138,13 +150,28 @@ const ManipulateDOM = (() => {
             pDescription.textContent = ToDo.description;
             let pDate = document.createElement("p");
             pDate.classList.add("todo-date");
-            pDate.textContent = ToDo.duedate;
+            pDate.textContent = format(ToDo.duedate, 'PPPP, hh:mm');
             let btnEdit = document.createElement("button");
             let btnDelete = document.createElement("button");
             btnDelete.id = "btnBorrarToDo";
             btnEdit.id = "btnEditarToDo";
             btnEdit.innerHTML = SVG.editBtn();
             btnDelete.innerHTML = SVG.deleteBtn();
+            btnEdit.addEventListener("click", () => {
+                while (todo.firstChild) {
+                    todo.removeChild(todo.lastChild);
+                }
+                todo.appendChild(configTodoDOM(ToDo,index, j));
+            });
+            btnDelete.addEventListener("click", () => { 
+                const todos = document.querySelector(".todos");
+                Projects.deleteToDofromProject(index,j);
+                while (todos.firstChild) {
+                    todos.removeChild(todos.lastChild);
+                }
+                todos.appendChild(todosDOM(index));
+                todos.appendChild(barDOM(index));
+            });
             todo_buttons.appendChild(btnEdit);
             todo_buttons.appendChild(btnDelete);
             todo_info.appendChild(pTitle);
@@ -187,7 +214,26 @@ const ManipulateDOM = (() => {
         return bar;
     }
 
-
+    const configTodoDOM = (ToDo,index,j) => {
+        let todoConfig = document.createElement("div");
+        todoConfig.classList.add("todo-config");
+        let inputTitle = document.createElement("input");
+        inputTitle.value = ToDo.title;
+        inputTitle.type = "text";
+        let inputDesc = document.createElement("input");
+        inputDesc.type = "text";
+        inputDesc.value = ToDo.description;
+        let inputDate = document.createElement("input");
+        inputDate.type = "datetime-local";
+        inputDate.value = format(ToDo.duedate, "yyyy-MM-dd'T'hh:mm");
+        let btnSubmit = document.createElement("button");
+        btnSubmit.textContent = "Edit fields";
+        todoConfig.appendChild(inputTitle);
+        todoConfig.appendChild(inputDesc);
+        todoConfig.appendChild(inputDate);
+        todoConfig.appendChild(btnSubmit);
+        return todoConfig;
+    }
     const ProjectFieldsDOM = (project, index) => {
         let wrap = document.createElement("div");
         wrap.classList.add("project-options");
@@ -211,7 +257,10 @@ const ManipulateDOM = (() => {
             const projectsDOM = document.querySelector(".list-projects");
             document.querySelector("#btnAddProject").classList.add("hidden");
             document.querySelector("#btnBackProject").classList.remove("hidden");
-            projectsDOM.replaceChildren(EditProjectDOM(project, index));
+            while (projectsDOM.firstChild) {
+                projectsDOM.removeChild(projectsDOM.lastChild);
+            }
+            projectsDOM.appendChild(EditProjectDOM(project, index));
 
         })
 
@@ -341,6 +390,9 @@ const ManipulateDOM = (() => {
 
             e.target.classList.add("hidden");
             btnBack.classList.remove("hidden");
+            while (projectDOM.firstChild) {
+                projectDOM.removeChild(projectDOM.lastChild);
+            }
             projectDOM.replaceChildren(createNewProjectDOM());
 
         });
