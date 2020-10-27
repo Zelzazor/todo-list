@@ -49,7 +49,17 @@ const Projects = (() => {
         LocalDB.saveTodo(projects[indexProject].title, projects[indexProject].getAllToDos());
     }
 
-    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject, deleteToDofromProject };
+    const editToDofromProject = (indexProject, indexTodo, title, description, duedate, notes, priority)=>{
+        projects[indexProject].editToDo(indexTodo, title, description, duedate, notes, priority);
+        LocalDB.saveTodo(projects[indexProject].title, projects[indexProject].getAllToDos());
+    }
+
+    const changeCheck = (indexProject,indexToDo, checked)=>{
+        projects[indexProject].changeCheckedToDo(indexToDo, checked);
+        LocalDB.saveTodo(projects[indexProject].title, projects[indexProject].getAllToDos());
+    }
+
+    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject, deleteToDofromProject, editToDofromProject, changeCheck };
 })();
 
 export {Projects};

@@ -20,7 +20,19 @@ const Project = (title, description) => {
     const getToDo = (index) => {
         return ToDos[index];
     }
-    return { title, description, addToDo, getAllToDos, removeToDo, getToDo };
+
+    const editToDo = (index, title, description, duedate, notes, priority) => {
+        ToDos[index].title = title;
+        ToDos[index].description = description;
+        ToDos[index].duedate = duedate;
+        ToDos[index].notes = notes;
+        ToDos[index].priority = priority;
+    }
+
+    const changeCheckedToDo = (index, checked)=>{
+        ToDos[index].checked = checked;
+    }
+    return { title, description, addToDo, getAllToDos, removeToDo, getToDo, editToDo,changeCheckedToDo };
 }
 
 
