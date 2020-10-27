@@ -1,100 +1,13 @@
-import { Project } from './Project';
+import { Projects } from './Projects';
 import { SVG } from './svg';
 import { format } from 'date-fns';
-
-const LocalDB = (() => {
-    const saveProjects = (projects) => {
-        localStorage.setItem("projects", JSON.stringify(projects));
-    }
-
-    const saveTodo = (title, ToDos) => {
-        localStorage.setItem(title, JSON.stringify(ToDos));
-    }
-
-    const getProjects = () => {
-        let projects = [];
-        if (localStorage.hasOwnProperty("projects")) {
-            let retrievedProjects = JSON.parse(localStorage.getItem("projects"));
-            retrievedProjects.forEach(project => {
-                projects.push(Project(project.title, project.description));
-                if (localStorage.hasOwnProperty(project.title)) {
-                    let retrievedTodos = JSON.parse(localStorage.getItem(project.title));
-                    retrievedTodos.forEach(ToDo => {
-                        projects[projects.length - 1].addToDo(ToDo.title, ToDo.description, ToDo.duedate, ToDo.priority, ToDo.notes, ToDo.checked);
-                    });
-                }
-
-            });
-
-        }
-        return projects;
-    }
-
-    const removeToDos = (title) => {
-        localStorage.removeItem(title);
-    }
-
-    return { saveProjects, getProjects, removeToDos, saveTodo };
-})();
-
-const Projects = (() => {
-
-    let projects = LocalDB.getProjects();
-
-    const addProject = (title, description) => {
-        projects.push(Project(title, description));
-        LocalDB.saveProjects(projects);
-    }
-
-    const editProject = (index, title, description) => {
-        LocalDB.removeToDos(projects[index].title);
-        projects[index].title = title;
-        projects[index].description = description;
-        LocalDB.saveProjects(projects);
-        LocalDB.saveTodo(projects[index].title, projects[index].getAllToDos());
-    }
-
-    const getAllProjects = () => {
-        return projects;
-    }
-
-    const addToDoOnProject = (index, title) => {
-        let today = new Date();
-        let day = today.getDate();
-        let month = today.getMonth();
-        let year = today.getFullYear();
-        let hours = today.getHours();
-        let minutes = today.getMinutes();
-        projects[index].addToDo(title, "", new Date(year,month,day,hours,minutes), "Low", "", false);
-        LocalDB.saveTodo(projects[index].title, projects[index].getAllToDos());
-
-    }
-
-    const getProject = (index) => {
-        return projects[index];
-    }
-
-    const removeProject = (index) => {
-        LocalDB.removeToDos(projects[index].title);
-        projects.splice(index, 1);
-        LocalDB.saveProjects(projects);
-    }
-
-    const deleteToDofromProject = (indexProject, indexToDo) => {
-        projects[indexProject].removeToDo(indexToDo);
-        LocalDB.saveTodo(projects[indexProject].title, projects[indexProject].getAllToDos());
-    }
-
-    return { addProject, getAllProjects, removeProject, editProject, getProject, addToDoOnProject, deleteToDofromProject };
-})();
-
 
 const ManipulateDOM = (() => {
 
     const putProjects = () => {
         const projectsDOM = document.querySelector('.list-projects');
-        let projects = Projects.getAllProjects();
-        projects.forEach((project, index) => {
+        
+        Projects.getAllProjects().forEach((project, index) => {
             let projectDOM = document.createElement("div");
             projectDOM.dataset.id = index;
             projectDOM.classList.add("project");
@@ -150,7 +63,7 @@ const ManipulateDOM = (() => {
             pDescription.textContent = ToDo.description;
             let pDate = document.createElement("p");
             pDate.classList.add("todo-date");
-            pDate.textContent = format(ToDo.duedate, 'PPPP, hh:mm');
+            pDate.textContent = format(ToDo.duedate, 'PPPP, HH:mm');
             let btnEdit = document.createElement("button");
             let btnDelete = document.createElement("button");
             btnDelete.id = "btnBorrarToDo";
@@ -161,7 +74,7 @@ const ManipulateDOM = (() => {
                 while (todo.firstChild) {
                     todo.removeChild(todo.lastChild);
                 }
-                todo.appendChild(configTodoDOM(ToDo,index, j));
+                todo.appendChild(configTodoDOM(index, j,ToDo));
             });
             btnDelete.addEventListener("click", () => { 
                 const todos = document.querySelector(".todos");
@@ -214,7 +127,7 @@ const ManipulateDOM = (() => {
         return bar;
     }
 
-    const configTodoDOM = (ToDo,index,j) => {
+    const configTodoDOM = (index,j,ToDo) => {
         let todoConfig = document.createElement("div");
         todoConfig.classList.add("todo-config");
         let inputTitle = document.createElement("input");
@@ -225,7 +138,7 @@ const ManipulateDOM = (() => {
         inputDesc.value = ToDo.description;
         let inputDate = document.createElement("input");
         inputDate.type = "datetime-local";
-        inputDate.value = format(ToDo.duedate, "yyyy-MM-dd'T'hh:mm");
+        inputDate.value = format(ToDo.duedate, "yyyy-MM-dd'T'HH:mm");
         let btnSubmit = document.createElement("button");
         btnSubmit.textContent = "Edit fields";
         todoConfig.appendChild(inputTitle);
@@ -359,7 +272,7 @@ const ManipulateDOM = (() => {
         form.appendChild(Error);
 
         // Submit Add Button Action
-        btnSubmit.addEventListener("click", (e) => {
+        btnSubmit.addEventListener("click", () => {
             if (txtTitle.value !== "" && txtDescription.value !== "") {
                 Projects.addProject(txtTitle.value, txtDescription.value);
                 reloadProjects();
