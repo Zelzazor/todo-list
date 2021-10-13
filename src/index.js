@@ -135,7 +135,7 @@ const ManipulateDOM = (() => {
                 todos.appendChild(barDOM(index));
             }
             else {
-                input.placeholder = "You should introduce something here.";
+                input.placeholder = "You should introduce something here...";
             }
 
         })
