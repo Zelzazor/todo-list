@@ -8,6 +8,13 @@ body {
   margin: 0;
 }
 
+.title-fesone {
+  font-size: 2rem;
+  background-color: #4CB681;
+  display: flex;
+  justify-content: center;
+}
+
 .container {
   display: flex;
   min-height: 100vh;
@@ -15,7 +22,7 @@ body {
 }
 
 .projects {
-  background-color: #416165;
+  background-color: #D0E5C4;
   width: 25%;
 }
 
@@ -26,12 +33,12 @@ body {
 }
 
 .project-details {
-  background-color: #d9dbf1;
+  background-color: #BDECEA;
   height: 30vh;
 }
 
 .todos {
-  background-color: #d0cdd7;
+  background-color: #FFFFFF;
   height: 100%;
 }
 
@@ -44,8 +51,7 @@ body {
   margin: 1rem 0rem;
   padding: 1rem;
   font-size: 0.9rem;
-  background-color: #416165;
-  color: white;
+  background-color: #D0E5C4;
   border: none;
   cursor: pointer;
   transition-duration: 200ms;
@@ -106,7 +112,7 @@ body {
   margin: 2rem 0rem;
   padding: 0.8rem;
   font-size: 0.9rem;
-  background-color: red;
+  background-color: #ff1919;
   color: white;
   border: none;
   cursor: pointer;
@@ -118,7 +124,7 @@ body {
 }
 
 .btn-aside:hover {
-  background-color: #acb0bd;
+  background-color: rgba(255, 255, 255, 0.62);
   color: black;
 }
 
@@ -128,20 +134,20 @@ body {
 }
 
 .high-p {
-  background-color: #db1f1f;
+  background-color: #f06363;
   color: white;
 }
 
 .medium-p {
-  background-color: #e6e217;
+  background-color: #fafa62;
 }
 
 .low-p {
-  background-color: #2abe0c;
+  background-color: #56d1ac;
   color: white;
 }
 .project {
-  background-color: #acb0bd;
+  background-color: rgba(255, 255, 255, 0.62);
   margin: 0.5rem 0rem;
   padding: 0.5rem;
   font-size: 1rem;
@@ -150,13 +156,13 @@ body {
 }
 
 .project:hover {
-  background-color: #d9dbf1;
+  background-color: #4CB681;
 }
 
 .form-add {
   display: flex;
   flex-direction: column;
-  background-color: #acb0bd;
+  background-color: #4CB681;
   margin: 0.5rem 0rem;
   padding: 0.5rem;
   font-size: 1rem;
@@ -200,7 +206,7 @@ input:focus {
   right: 0;
   margin: 1% 2%;
   border-radius: 1rem;
-  background-color: white;
+  background-color: rgb(77, 77, 77);
   transition-duration: 200ms;
 }
 
@@ -210,6 +216,8 @@ input:focus {
 
 .text-fixed {
   padding: 0.8rem;
+  background-color: rgb(77, 77, 77);
+  color: white;
   font-size: 1.3rem;
   border-radius: 1rem;
   border: none;
@@ -217,7 +225,7 @@ input:focus {
 }
 
 .btn-fixed {
-  background-color: white;
+  background-color: rgba(77, 77, 77);
   color: black;
   border-radius: 1rem;
   width: 3rem;
@@ -228,7 +236,7 @@ input:focus {
 }
 
 .btn-fixed:hover {
-  background-color: #ebebeb;
+  background-color: rgb(54, 54, 54);
 }
 
 .todowrap {
@@ -283,7 +291,9 @@ input:focus {
   margin: 0rem 2rem 0rem 0rem;
 }
 
-@media (max-width: 500px) {
+
+
+@media (max-width: 768px) {
   .container {
     flex-direction: column;
     min-height: 100vh;
